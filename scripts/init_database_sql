@@ -1,0 +1,27 @@
+-- create Database 'DataWAREhouse'
+use master;
+GO
+-- Drop and recreate the 'Datawarehouse' database
+IF exists(select 1 from sys.databases where name = 'Datawarehouse')
+BEGIN
+     ALTER database Datawarehuse set single_user with rollback immediate;
+     DROP database Datawarehouse;
+END
+GO
+-- create the database 'Datawarehouse'
+create DATABASE Datawarehouse;
+GO
+
+use Datawarehouse;
+GO
+
+CREATE SCHEMA bronze;
+GO
+
+CREATE SCHEMA silver;
+GO
+
+CREATE SCHEMA gold;
+GO
+
+--this create a datbase name Datawarehouse after checking if it already exists.Aditionaly three schemas within the database:'Bronze','silver','gold'.
