@@ -1,0 +1,120 @@
+  /*
+  =================================
+  stored procedure Source -----> bronze layer
+  =================================
+  */
+  CREATE or ALTER PROCEDURE bronze.load_bronze AS
+	BEGIN
+	Declare @start_time datetime, @end_time datetime,@batch_start_time datetime,@batch_end_time datetime;
+	BEGIN TRY
+		SET @batch_start_time = GETDATE();
+		print '=====================';
+		print 'Loading bronze layer';
+		print '=====================';
+
+		print '----------------------';
+		print 'Loading CRM tables';
+		print '----------------------';
+		SET @start_time = GETDATE();
+		PRINT '>>Truncating the table:bronze.crm_cust_info';
+		TRUNCATE TABLE bronze.crm_cust_info;
+		PRINT '>>Inserting data into:bronze.crm_cust_info';
+		BULK INSERT bronze.crm_cust_info
+		from 'C:\Users\nency\OneDrive - National Institute of Technology, Rourkela\Projects(DATA)\DATASET\source_crm\cust_info.csv'
+		with (
+		FIRSTROW = 2,
+		FIELDTERMINATOR = ',',
+		TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>>Load duration :' + Cast(datediff(second,@start_time,@end_time) as NVARCHAR ) + 'seconds';
+		print '>>-----------------------';
+		SET @start_time = GETDATE();
+		PRINT '>>Truncating the table:bronze.crm_prd_info';
+		TRUNCATE TABLE bronze.crm_prd_info;
+		PRINT '>>Inserting data into:bronze.crm_prd_info';
+		bulk insert bronze.crm_prd_info
+		from 'C:\Users\nency\OneDrive - National Institute of Technology, Rourkela\Projects(DATA)\DATASET\source_crm\prd_info.csv'
+		with(
+		firstrow = 2,
+		fieldterminator = ',',
+		TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>>Load duration :' + Cast(datediff(second,@start_time,@end_time) as NVARCHAR ) + 'seconds';
+		print '>>-----------------------';
+		SET @start_time = GETDATE();
+		PRINT '>>Truncating the table:bronze.crm_sales_details';
+		TRUNCATE TABLE bronze.crm_sales_details;
+		PRINT '>>Inserting data into:bronze.crm_sales_details';
+		bulk insert bronze.crm_sales_details
+		from 'C:\Users\nency\OneDrive - National Institute of Technology, Rourkela\Projects(DATA)\DATASET\source_crm\sales_details.csv'
+		with(
+		firstrow = 2,
+		fieldterminator = ',',
+		TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>>Load duration :' + Cast(datediff(second,@start_time,@end_time) as NVARCHAR ) + 'seconds';
+		print '>>-----------------------';
+		print '----------------------';
+		print 'Loading ERP tables';
+		print '----------------------';
+		SET @start_time = GETDATE();
+		PRINT '>>Truncating the table:bronze.erp_cust_az12';
+		TRUNCATE TABLE bronze.erp_cust_az12;
+		PRINT '>>Inserting data into:bronze.erp_cust_az12';
+		bulk insert bronze.erp_cust_az12
+		from 'C:\Users\nency\OneDrive - National Institute of Technology, Rourkela\Projects(DATA)\DATASET\source_erp/cust_az12.csv'
+		with(
+		firstrow = 2,
+		fieldterminator = ',',
+		TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>>Load duration :' + Cast(datediff(second,@start_time,@end_time) as NVARCHAR ) + 'seconds';
+		print '>>-----------------------';
+		SET @start_time = GETDATE();
+		PRINT '>>Truncating the table:bronze.erp_loc_a101';
+		TRUNCATE TABLE bronze.erp_loc_a101
+		PRINT '>>Inserting data into:bronze.erp_cust_az12';
+		bulk insert bronze.erp_loc_a101
+		from 'C:\Users\nency\OneDrive - National Institute of Technology, Rourkela\Projects(DATA)\DATASET\source_erp\loc_a101.csv'
+		with(
+		firstrow = 2,
+		fieldterminator = ',',
+		TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>>Load duration :' + Cast(datediff(second,@start_time,@end_time) as NVARCHAR ) + 'seconds';
+		print '>>-----------------------';
+		SET @start_time = GETDATE();
+		PRINT '>>Truncating the table:erp_px_cat_g1v2';
+		TRUNCATE TABLE bronze.erp_px_cat_g1v2;
+		PRINT '>>Inserting data into:erp_px_cat_g1v2';
+		bulk insert bronze.erp_px_cat_g1v2
+		from 'C:\Users\nency\OneDrive - National Institute of Technology, Rourkela\Projects(DATA)\DATASET\source_erp\px_cat_g1v2.csv'
+		with(
+		firstrow = 2,
+		fieldterminator = ',',
+		TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>>Load duration :' + Cast(datediff(second,@start_time,@end_time) as NVARCHAR ) + 'seconds';
+		print '>>-----------------------';
+		
+		SET @batch_end_time = GETDATE();
+		PRINT '=================='
+		PRINT 'Loading Bronze layer is completed'
+		PRINT '-Total load duration : '+cast(datediff(second,@batch_start_time,@batch_end_time) as nvarchar) + 'Seconds';
+		PRINT '==================='
+		END TRY
+	BEGIN CATCH
+	PRINT '===========================';
+	print 'ERROR OCCURED DURING LOADING BRONZE LAYER'
+	PRINT 'ERROR MEASSAGE' + ERROR_MESSAGE();
+	PRINT 'ERROR MEASSAGE' + cast(ERROR_number() as Nvarchar);
+	PRINT 'ERROR MEASSAGE' + cast(ERROR_state() as Nvarchar);
+	PRINT '===========================';
+	END CATCH
+	END
